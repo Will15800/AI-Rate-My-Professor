@@ -1,0 +1,124 @@
+{
+    "reviews": [
+      {
+        "professor": "Dr. Sarah Johnson",
+        "subject": "Physics",
+        "stars": 4,
+        "review": "Dr. Johnson explains complex concepts clearly. Her enthusiasm for physics is contagious!"
+      },
+      {
+        "professor": "Prof. Michael Chen",
+        "subject": "Computer Science",
+        "stars": 5,
+        "review": "Brilliant teacher! Prof. Chen's practical approach to coding made the course incredibly valuable."
+      },
+      {
+        "professor": "Dr. Emily Rodriguez",
+        "subject": "Biology",
+        "stars": 3,
+        "review": "Knowledgeable, but lectures can be dry. More interactive sessions would be helpful."
+      },
+      {
+        "professor": "Prof. David Kim",
+        "subject": "Mathematics",
+        "stars": 4,
+        "review": "Challenging course, but Prof. Kim is always available for extra help. Appreciate his patience."
+      },
+      {
+        "professor": "Dr. Lisa Patel",
+        "subject": "Chemistry",
+        "stars": 5,
+        "review": "Dr. Patel's lab sessions are fantastic! She makes organic chemistry understandable and fun."
+      },
+      {
+        "professor": "Prof. James Wilson",
+        "subject": "History",
+        "stars": 2,
+        "review": "Lectures are disorganized. Prof. Wilson seems knowledgeable but struggles to convey information effectively."
+      },
+      {
+        "professor": "Dr. Maria Garcia",
+        "subject": "Psychology",
+        "stars": 4,
+        "review": "Engaging lecturer with lots of real-world examples. Dr. Garcia's research insights are fascinating."
+      },
+      {
+        "professor": "Prof. Robert Taylor",
+        "subject": "English Literature",
+        "stars": 3,
+        "review": "Prof. Taylor has extensive knowledge, but grading can be inconsistent. Feedback is sometimes vague."
+      },
+      {
+        "professor": "Dr. Olivia Brown",
+        "subject": "Economics",
+        "stars": 5,
+        "review": "Dr. Brown's class discussions are thought-provoking. She expertly relates economic theory to current events."
+      },
+      {
+        "professor": "Prof. Thomas Lee",
+        "subject": "Electrical Engineering",
+        "stars": 4,
+        "review": "Challenging course material, but Prof. Lee's practical demos make concepts easier to grasp."
+      },
+      {
+        "professor": "Dr. Emma White",
+        "subject": "Sociology",
+        "stars": 3,
+        "review": "Interesting topics, but Dr. White could improve on facilitating more class participation."
+      },
+      {
+        "professor": "Prof. Daniel Martinez",
+        "subject": "Art History",
+        "stars": 5,
+        "review": "Prof. Martinez's passion for art is infectious. His virtual museum tours are a highlight!"
+      },
+      {
+        "professor": "Dr. Rachel Cohen",
+        "subject": "Political Science",
+        "stars": 4,
+        "review": "Dr. Cohen encourages critical thinking. Her balanced approach to controversial topics is commendable."
+      },
+      {
+        "professor": "Prof. Kevin O'Brien",
+        "subject": "Marketing",
+        "stars": 2,
+        "review": "Course content feels outdated. Prof. O'Brien could benefit from incorporating more digital marketing strategies."
+      },
+      {
+        "professor": "Dr. Sophia Nguyen",
+        "subject": "Environmental Science",
+        "stars": 5,
+        "review": "Dr. Nguyen's field trips bring the subject to life. Her commitment to sustainability is inspiring."
+      },
+      {
+        "professor": "Prof. Alexander Ivanov",
+        "subject": "Philosophy",
+        "stars": 4,
+        "review": "Prof. Ivanov's Socratic method of teaching encourages deep thinking. Challenging but rewarding course."
+      },
+      {
+        "professor": "Dr. Jessica Williams",
+        "subject": "Neuroscience",
+        "stars": 3,
+        "review": "Dr. Williams is clearly an expert, but her lectures can be hard to follow. More visual aids would help."
+      },
+      {
+        "professor": "Prof. Samuel Clark",
+        "subject": "Music Theory",
+        "stars": 5,
+        "review": "Prof. Clark's interactive approach to music theory is fantastic. His enthusiasm is contagious!"
+      },
+      {
+        "professor": "Dr. Laura Anderson",
+        "subject": "Linguistics",
+        "stars": 4,
+        "review": "Dr. Anderson's course opened my eyes to the complexity of language. Her assignments are creative and engaging."
+      },
+      {
+        "professor": "Prof. Hassan Al-Farsi",
+        "subject": "International Relations",
+        "stars": 3,
+        "review": "Prof. Al-Farsi brings valuable real-world experience, but course structure could be improved for better flow."
+      }
+    ]
+  }
