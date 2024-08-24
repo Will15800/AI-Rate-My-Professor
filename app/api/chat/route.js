@@ -28,12 +28,16 @@ export async function POST(req) {
         const index = pc.index('rag');
         const inference = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
+        // Extract the user's query
         const text = data[data.length - 1].content;
+        
+        // Generate embeddings using Hugging Face model
         const embedding = await inference.featureExtraction({
             model: 'sentence-transformers/all-MiniLM-L6-v2',
             inputs: text,
         });
 
+        // Query Pinecone index with generated embeddings
         const result = await index.query({
             vector: embedding,
             topK: 3,
@@ -41,7 +45,7 @@ export async function POST(req) {
             namespace: 'ns1'
         });
 
-        let resultString = 'Returned result from vectordb (done automatically):';
+        let resultString = '\n\nReturned result from vectordb (done automatically):';
         result.matches.forEach((match) => {
             resultString += `\n
             Professor: ${match.id}
@@ -51,15 +55,47 @@ export async function POST(req) {
             \n\n`;
         });
 
-        const lastMessageContent = text + '\n\n' + resultString;
+        // Combine the retrieved results with the last user message
+        const lastMessage = data[data.length - 1];  // Get the last message from the user
+        const lastMessageContent = lastMessage.content + resultString;  // Append the retrieved results to the user's message
 
-        // Here you would typically send this to your language model (e.g., GPT) 
-        // along with the system prompt to generate the final response.
-        // For now, we'll just return the retrieved data.
+        // Prepare the conversation history without the last user message
+        const lastDataWithoutLastMessage = data.slice(0, data.length - 1);  
 
-        return NextResponse.json({ result: lastMessageContent });
+        // Combine the system prompt, the conversation history, and the modified last message content
+        const inputContent = `${systemPrompt}\n\n${lastDataWithoutLastMessage.map(message => message.role + ': ' + message.content).join('\n')}\nUser: ${lastMessageContent}`;
+
+        // Use the inputContent in the text generation request
+        const response = await inference.textGeneration({
+            model: 'bigscience/bloom-560m',
+            inputs: inputContent,  // Use the combined content as input
+            parameters: {
+                max_length: 500, // Adjust the max length as needed
+                temperature: 0.7, // Adjust temperature for randomness
+            },
+        });
+
+        // Create a readable stream for the response
+        const stream = new ReadableStream({
+            async start(controller) {
+                const encoder = new TextEncoder();
+                try {
+                    const content = response.generated_text;
+                    if (content) {
+                        const text = encoder.encode(content);
+                        controller.enqueue(text);
+                    }
+                } catch (err) {
+                    controller.error(err);
+                } finally {
+                    controller.close();
+                }
+            },
+        });
+
+        return new NextResponse(stream);
     } catch (error) {
         console.error('Error in POST request:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
-}//stopped at 30:08
+}
