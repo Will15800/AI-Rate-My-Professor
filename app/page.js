@@ -1,8 +1,9 @@
 'use client'
 
 import { Box, Button, Stack, TextField, Divider, Typography } from '@mui/material'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Link from 'next/link';
 
 const theme = createTheme({
   breakpoints: {
@@ -72,6 +73,12 @@ export default function Home() {
     }
   }
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -90,6 +97,19 @@ export default function Home() {
           p={2}
           spacing={3}
         >
+          <Box
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Link href="https://www.ratemyprofessors.com/" passHref>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <i className="bx bxs-chat" style={{ color: "black", fontSize: "24px" }}></i>
+                <Typography variant="subtitle1" color="black">RMP</Typography>
+              </Box>
+            </Link>
+          </Box>
           <Divider />
           <Stack
             direction={"column"}
