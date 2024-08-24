@@ -47,6 +47,65 @@ export default function Home() {
       })
     })
   }
-  // return();
-  // stopped at 43.01 u have to do UI part
+  return(<Box
+    width = "100vh"
+    height = "100vh"
+    display = "flex"
+    justifyContent = "center"
+    alignItems = "center"
+    flexDirection = "column"
+  >
+    <Stack
+      direction = "column"
+      width = "500px"
+      height = "700px"
+      border = "1px solid black"
+      p = {2}
+      spacing = {3}    
+    >
+      <Stack
+        direction = "column"
+        spacing={2}
+        flexGrow={1}
+        overflow = {'auto'}
+        maxHeight={'100%'}
+      >
+      {
+        messages.map((message, index) => {
+          return(
+            <Box
+              key = {index}
+              display = "flex"
+              justifyContent = {message.role === 'assistant' ? 'flex-start' : 'flex-end'}
+            >
+              <Box
+                bgcolor = {message.role === 'assistant' ? 'primary.main' : 'secondary.main'}
+                color = "white"
+                p = {2}
+                borderRadius = {16}
+              >
+                {message.content}
+              </Box>
+            </Box>
+          )
+        })
+      }
+      </Stack>
+      <Stack
+        direction = "row" spacing = {2}>
+          <TextField
+          label
+          fullWidth
+          value = {message}
+          onChange = {(e) => setMessage(e.target.value)}
+          />
+          <Button
+          variant = "contained"
+          onClick = {sendMessage}
+          >Send</Button>
+      </Stack>
+    </Stack>
+  </Box>
+  )
+  
 }
