@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Button, Stack, TextField, Divider, Typography } from '@mui/material'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Link from 'next/link';
 
@@ -28,44 +28,62 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef(null);
 
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
+    if (!message.trim()) return;
+  
     setIsLoading(true);
-    setMessage('')
-    setMessages((messages) => [
-      ...messages,
-      { role: 'user', content: message },
-      { role: 'assistant', content: '' },
-    ])
+    const newUserMessage = { role: 'user', content: message };
+    
+    // Immediately update messages with the user's message
+    setMessages(prevMessages => [...prevMessages, newUserMessage]);
+    
+    // Clear the input field
+    setMessage('');
+  
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify([...messages, newUserMessage]),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    const response = fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify([...messages, { role: 'user', content: message }]),
-    }).then(async (res) => {
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let result = ''
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantMessage = '';
 
-      return reader.read().then(function processText({ done, value }) {
-        if (done) {
-          setIsLoading(false);
-          return result
-        }
-        const text = decoder.decode(value || new Uint8Array(), { stream: true })
-        setMessages((messages) => {
-          let lastMessage = messages[messages.length - 1]
-          let otherMessages = messages.slice(0, messages.length - 1)
-          return [
-            ...otherMessages,
-            { ...lastMessage, content: lastMessage.content + text },
-          ]
-        })
-        return reader.read().then(processText)
-      })
-    })
-  }
+      // Add a placeholder for the assistant's message
+      setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: '' }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        assistantMessage += chunk;
+        
+        // Update the assistant's message as it comes in
+        setMessages(prevMessages => {
+          const newMessages = [...prevMessages];
+          newMessages[newMessages.length - 1] = { role: 'assistant', content: assistantMessage.trim() };
+          return newMessages;
+        });
+      }
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        { role: 'assistant', content: 'Sorry, an error occurred. Please try again.' },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [message, messages]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter' && !isLoading) {
@@ -90,12 +108,12 @@ export default function Home() {
         alignItems="center"
       >
         <Stack
-          direction={"column"}
-          width="500px"
-          height="700px"
-          border="1px solid black"
-          p={2}
-          spacing={3}
+           direction={"column"}
+           width={{ xs: "80%", sm: "50%", md: "500px" }}
+           height={{ xs: "60vh", sm: "70%", md: "100px" }}
+           border="1px solid black"
+           p={2}
+           spacing={3}
         >
           <Box
             display="flex"
@@ -119,23 +137,37 @@ export default function Home() {
             maxHeight="100%"
           >
             {messages.map((message, index) => (
-              <Box
-                key={index}
-                display="flex"
-                justifyContent={
-                  message.role === "assistant" ? "flex-start" : "flex-end"
-                }
-              >
-                <Box
-                  bgcolor={message.role === "assistant" ? "grey.200" : "blue.600"}
-                  color={message.role === "assistant" ? "black" : "white"}
-                  borderRadius={4}
-                  p={1.6}
-                >
-                  {message.content}
-                </Box>
-              </Box>
-            ))}
+  <Box
+    key={index}
+    display="flex"
+    justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
+    mb={2}
+  >
+    <Box
+      bgcolor={message.role === "assistant" ? "grey.300" : "#1976d2"}
+      color={message.role === "assistant" ? "black" : "white"}
+      borderRadius={4}
+      p={2}
+      maxWidth="80%"
+    >
+      {message.role === "assistant" ? (
+        <Typography component="div">
+          {message.content.split('\n').map((paragraph, i) => (
+            <Typography key={i} paragraph>
+              {paragraph.startsWith('Professor') ? (
+                <strong>{paragraph}</strong>
+              ) : (
+                paragraph
+              )}
+            </Typography>
+          ))}
+        </Typography>
+      ) : (
+        <Typography>{message.content}</Typography>
+      )}
+    </Box>
+  </Box>
+))}
             <div ref={messagesEndRef} />
           </Stack>
           <Stack direction={"row"} spacing={2}>
@@ -146,11 +178,13 @@ export default function Home() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               disabled={isLoading}
+              aria-label="Enter your message"
             />
             <Button
               variant="contained"
               onClick={sendMessage}
               disabled={isLoading}
+              aria-label="Send message"
             >
               {isLoading ? "Sending..." : "Send"}
             </Button>

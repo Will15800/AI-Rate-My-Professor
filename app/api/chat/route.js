@@ -1,23 +1,14 @@
 import { NextResponse } from 'next/server';
 import { Pinecone } from '@pinecone-database/pinecone';
-import { HfInference } from '@huggingface/inference';
+import Groq from 'groq-sdk';
 
-const systemPrompt = `You are an AI assistant specialized in helping students find suitable professors based on their queries. Your knowledge comes from a database of professor reviews and ratings, which you access using a RAG (Retrieval-Augmented Generation) system.
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
-For each user query, you will be provided with information about the top 3 most relevant professors based on the RAG search. Your task is to analyze this information and present it to the student in a helpful, concise, and informative manner.
-
-When responding:
-1. Always provide information about all 3 professors, even if some seem less relevant.
-2. Summarize key points from the reviews, including teaching style, course difficulty, and any standout positive or negative comments.
-3. Mention the professor's name, subject area, and overall rating (in stars) if available.
-4. If the query is about a specific subject or teaching style, highlight how each professor matches or differs from the request.
-5. Be objective and balanced. Present both positive and negative aspects from the reviews.
-6. Don't invent or assume information not present in the provided data.
-7. If the query doesn't seem to match the retrieved professors well, acknowledge this and explain why the results might be relevant.
-8. Conclude with a brief comparison of the three professors, highlighting their main differences or similarities.
-9. If appropriate, suggest what additional information the student might want to consider when making their decision.
-
-Remember, your goal is to help students make informed decisions about their professors based on the experiences of other students. Be helpful, but encourage students to use this information as just one factor in their decision-making process.`;
+const systemPrompt = `
+You are an AI assistant specialized in helping students find suitable professors based on their queries. Your knowledge comes from a database of professor reviews and ratings. Respond directly to the user's query using the provided information about professors. If the query is a greeting or not directly related to professor information, respond politely and ask how you can assist with finding professor information.
+`;
 
 export async function POST(req) {
     try {
@@ -26,76 +17,110 @@ export async function POST(req) {
             apiKey: process.env.PINECONE_API_KEY,
         });
         const index = pc.index('rag');
-        const inference = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
         // Extract the user's query
         const text = data[data.length - 1].content;
         
-        // Generate embeddings using Hugging Face model
-        const embedding = await inference.featureExtraction({
-            model: 'sentence-transformers/all-MiniLM-L6-v2',
-            inputs: text,
+        // Generate embeddings using GROQ
+        const embeddingResponse = await groq.chat.completions.create({
+            model: "llama-3.1-70b-versatile",
+            messages: [
+                {
+                    role: "system",
+                    content: "Generate a comma-separated list of 1536 floating-point numbers representing the embedding for the following text."
+                },
+                {
+                    role: "user",
+                    content: text
+                }
+            ],
+            temperature: 0,
+            max_tokens: 3072
         });
+
+        const embeddingString = embeddingResponse.choices[0].message.content.trim();
+        const embedding = embeddingString.split(',').map(Number);
 
         // Query Pinecone index with generated embeddings
         const result = await index.query({
             vector: embedding,
-            topK: 3,
+            topK: 5,  // Increased from 3 to 5 for more context
             includeMetadata: true,
-            namespace: 'ns1'
         });
 
-        let resultString = '\n\nReturned result from vectordb (done automatically):';
-        result.matches.forEach((match) => {
-            resultString += `\n
-            Professor: ${match.id}
-            Review: ${match.metadata.review}
-            Subject: ${match.metadata.subject}
-            Stars: ${match.metadata.stars}
-            \n\n`;
+        // Prepare result string
+        let resultString = 'Retrieved professor information:\n';
+        result.matches.forEach((match, index) => {
+            resultString += `
+Professor ${index + 1}: ${match.id}
+Review: ${match.metadata.review.slice(0, 300)}...
+Subject: ${match.metadata.subject}
+Stars: ${match.metadata.stars}
+`;
         });
 
-        // Combine the retrieved results with the last user message
-        const lastMessage = data[data.length - 1];  // Get the last message from the user
-        const lastMessageContent = lastMessage.content + resultString;  // Append the retrieved results to the user's message
+        console.log("User query:", text);
+        console.log("Retrieved professor information:", resultString);
 
-        // Prepare the conversation history without the last user message
-        const lastDataWithoutLastMessage = data.slice(0, data.length - 1);  
+        // Combine the system prompt, user query, and RAG results
+        const inputContent = `${systemPrompt}
 
-        // Combine the system prompt, the conversation history, and the modified last message content
-        const inputContent = `${systemPrompt}\n\n${lastDataWithoutLastMessage.map(message => message.role + ': ' + message.content).join('\n')}\nUser: ${lastMessageContent}`;
+User query: "${text}"
 
-        // Use the inputContent in the text generation request
-        const response = await inference.textGeneration({
-            model: 'bigscience/bloom-560m',
-            inputs: inputContent,  // Use the combined content as input
-            parameters: {
-                max_length: 500, // Adjust the max length as needed
-                temperature: 0.7, // Adjust temperature for randomness
-            },
+${resultString}
+
+Based on the above information, please provide a helpful and complete response to the user's query. If recommending professors, please format your response as follows:
+
+Hello! Here are some recommended professors for database management:
+
+Professor [Name]:
+- [Key point about teaching style]
+- [Student feedback]
+- Course: "[Course Name]", Rating: [X.X] out of 5
+
+[Repeat for each professor]
+
+Is there anything else you'd like to know about these professors or their courses?`;
+
+        console.log("Input content for language model:", inputContent);
+
+        // Use GROQ for text generation with streaming
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt,
+                },
+                {
+                    role: "user",
+                    content: inputContent,
+                },
+            ],
+            model: "mixtral-8x7b-32768",
+            temperature: 0.7,
+            max_tokens: 500,  // Increased from 150 to 500
+            top_p: 0.9,
+            stream: true,  // Enable streaming
         });
 
         // Create a readable stream for the response
         const stream = new ReadableStream({
             async start(controller) {
                 const encoder = new TextEncoder();
-                try {
-                    const content = response.generated_text;
-                    if (content) {
-                        const text = encoder.encode(content);
-                        controller.enqueue(text);
-                    }
-                } catch (err) {
-                    controller.error(err);
-                } finally {
-                    controller.close();
+                for await (const chunk of completion) {
+                    const content = chunk.choices[0]?.delta?.content || '';
+                    controller.enqueue(encoder.encode(content));
                 }
+                controller.close();
             },
         });
 
         return new NextResponse(stream);
     } catch (error) {
-        console.error('Error in POST request:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Detailed error in POST request:', error);
+        if (error.error && error.error.message) {
+            console.error('API Error:', error.error.message);
+        }
+        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
