@@ -57,7 +57,7 @@ const SignUpPage = () => {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push('/pantry'); // Redirect to pantry page after sign up
+      router.push('/Chatbox');
     } catch (error) {
       let errorMessage = 'An error occurred. Please try again.';
       switch (error.code) {
@@ -87,7 +87,7 @@ const SignUpPage = () => {
       <AppBar position="static" color="primary">
         <Toolbar>
           <Typography variant="h6" color="inherit">
-            Profplus
+            RateMyProfAI
           </Typography>
         </Toolbar>
       </AppBar>

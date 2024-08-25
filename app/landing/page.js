@@ -160,7 +160,7 @@ const LandingPage = () => {
         <AppBar position="static" color="transparent" elevation={1}>
           <Toolbar>
             <Typography variant="h6" color="primary" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-              ProfPlus
+              RateMyProfAI
             </Typography>
             <IconButton
               color="primary"
@@ -186,10 +186,10 @@ const LandingPage = () => {
             textAlign="center"
           >
             <Typography variant="h3"  component="h1" gutterBottom sx={{mt: '10px',  color: '#222222'}}  >
-              ProfPlus
+              RateMyProfAI
             </Typography>
             <Typography variant="h5" component="h2" gutterBottom sx={{ marginBottom: '16px', mt: '10px', color: '#5D5D5D', fontWeight: 'bold' }}>
-            Become a better student with ProfPlus. It's free.
+            Become a better student with RateMyProfAI. It's free.
             </Typography>
             <Typography variant="h5" paragraph sx={{ maxWidth: '600px', mx: 'auto', mt: '10px'
              }}>

@@ -15,6 +15,14 @@ const theme = createTheme({
       xl: 1920,
     },
   },
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#9e9e9e',
+    },
+  },
 });
 
 export default function Home() {
@@ -106,13 +114,18 @@ export default function Home() {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
+        bgcolor="#f5f5f5"
+        p={2}
       >
         <Stack
            direction={"column"}
-           width={{ xs: "80%", sm: "50%", md: "500px" }}
-           height={{ xs: "60vh", sm: "70%", md: "100px" }}
-           border="1px solid black"
+           width={{ xs: "100%", sm: "80%", md: "60%", lg: "40%" }}
+           height="80vh"
+           border="1px solid #ccc"
+           borderRadius={4}
+           bgcolor="white"
            p={2}
+           boxShadow={3}
            spacing={3}
         >
           <Box
@@ -123,8 +136,8 @@ export default function Home() {
           >
             <Link href="https://www.ratemyprofessors.com/" passHref>
               <Box display="flex" flexDirection="column" alignItems="center">
-                <i className="bx bxs-chat" style={{ color: "black", fontSize: "24px" }}></i>
-                <Typography variant="subtitle1" color="black">RMP</Typography>
+                <i className="bx bxs-chat" style={{ color: "#1976d2", fontSize: "36px" }}></i>
+                <Typography variant="h6" color="primary">Rate My Professor</Typography>
               </Box>
             </Link>
           </Box>
@@ -137,40 +150,40 @@ export default function Home() {
             maxHeight="100%"
           >
             {messages.map((message, index) => (
-  <Box
-    key={index}
-    display="flex"
-    justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
-    mb={2}
-  >
-    <Box
-      bgcolor={message.role === "assistant" ? "grey.300" : "#1976d2"}
-      color={message.role === "assistant" ? "black" : "white"}
-      borderRadius={4}
-      p={2}
-      maxWidth="80%"
-    >
-      {message.role === "assistant" ? (
-        <Typography component="div">
-          {message.content.split('\n').map((paragraph, i) => (
-            <Typography key={i} paragraph>
-              {paragraph.startsWith('Professor') ? (
-                <strong>{paragraph}</strong>
-              ) : (
-                paragraph
-              )}
-            </Typography>
-          ))}
-        </Typography>
-      ) : (
-        <Typography>{message.content}</Typography>
-      )}
-    </Box>
-  </Box>
-))}
+              <Box
+                key={index}
+                display="flex"
+                justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
+                mb={2}
+              >
+                <Box
+                  bgcolor={message.role === "assistant" ? "secondary.main" : "primary.main"}
+                  color={message.role === "assistant" ? "black" : "white"}
+                  borderRadius={4}
+                  p={2}
+                  maxWidth="75%"
+                >
+                  {message.role === "assistant" ? (
+                    <Typography component="div">
+                      {message.content.split('\n').map((paragraph, i) => (
+                        <Typography key={i} paragraph>
+                          {paragraph.startsWith('Professor') ? (
+                            <strong>{paragraph}</strong>
+                          ) : (
+                            paragraph
+                          )}
+                        </Typography>
+                      ))}
+                    </Typography>
+                  ) : (
+                    <Typography>{message.content}</Typography>
+                  )}
+                </Box>
+              </Box>
+            ))}
             <div ref={messagesEndRef} />
           </Stack>
-          <Stack direction={"row"} spacing={2}>
+          <Stack direction={"row"} spacing={2} mt={2}>
             <TextField
               label="Message"
               fullWidth
@@ -179,18 +192,21 @@ export default function Home() {
               onKeyPress={handleKeyPress}
               disabled={isLoading}
               aria-label="Enter your message"
+              variant="outlined"
+              autoFocus
             />
             <Button
               variant="contained"
               onClick={sendMessage}
               disabled={isLoading}
               aria-label="Send message"
+              size="large"
             >
               {isLoading ? "Sending..." : "Send"}
             </Button>
           </Stack>
         </Stack>
-        <Typography variant="caption" color="grey" fontStyle="italic">
+        <Typography variant="caption" color="grey" fontStyle="italic" mt={2}>
           This AI assistant is NOT a certified academic advisor.
         </Typography>
       </Box>
