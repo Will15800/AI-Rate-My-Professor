@@ -103,14 +103,19 @@ export async function POST(req) {
             stream: true,  // Enable streaming
         });
 
-        // Stream response directly
-        const response = new Response(completion.body, {
-            headers: {
-                'Content-Type': 'text/plain'
-            }
+        // Create a readable stream for the response
+        const stream = new ReadableStream({
+            async start(controller) {
+                const encoder = new TextEncoder();
+                for await (const chunk of completion) {
+                    const content = chunk.choices[0]?.delta?.content || '';
+                    controller.enqueue(encoder.encode(content));
+                }
+                controller.close();
+            },
         });
 
-        return response;
+        return new NextResponse(stream);
     } catch (error) {
         console.error('Detailed error in POST request:', error);
         if (error.error && error.error.message) {
