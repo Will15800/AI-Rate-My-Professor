@@ -85,7 +85,7 @@ const SignInPage = () => {
       }}>
       <AppBar position="static" color="transparent" elevation={1}>
         <Toolbar>
-          <Typography variant="h6" color="inherit">
+          <Typography variant="h6" color="inherit" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             RateMyProfAI
           </Typography>
         </Toolbar>

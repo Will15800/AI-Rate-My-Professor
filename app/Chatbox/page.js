@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { Box, Button, Stack, TextField, Divider, Typography, Container } from '@mui/material';
+import { Box, Button, Stack, TextField, Divider, Typography } from '@mui/material';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Link from 'next/link';
-import Image from 'next/image'; // Import from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion';
+import { FaComments, FaSignOutAlt } from 'react-icons/fa'; 
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const theme = createTheme({
   breakpoints: {
@@ -19,10 +19,10 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#606060',
     },
     secondary: {
-      main: '#9e9e9e',
+      main: '#C0C0C0',
     },
   },
 });
@@ -37,19 +37,18 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
 
   const sendMessage = useCallback(async () => {
     if (!message.trim()) return;
-  
+
     setIsLoading(true);
     const newUserMessage = { role: 'user', content: message };
-    
-    // Immediately update messages with the user's message
-    setMessages(prevMessages => [...prevMessages, newUserMessage]);
-    
-    // Clear the input field
+
+    setMessages((prevMessages) => [...prevMessages, newUserMessage]);
     setMessage('');
-  
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -58,7 +57,7 @@ export default function Home() {
         },
         body: JSON.stringify([...messages, newUserMessage]),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -67,18 +66,16 @@ export default function Home() {
       const decoder = new TextDecoder();
       let assistantMessage = '';
 
-      // Add a placeholder for the assistant's message
-      setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: '' }]);
+      setMessages((prevMessages) => [...prevMessages, { role: 'assistant', content: '' }]);
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         const chunk = decoder.decode(value, { stream: true });
         assistantMessage += chunk;
-        
-        // Update the assistant's message as it comes in
-        setMessages(prevMessages => {
+
+        setMessages((prevMessages) => {
           const newMessages = [...prevMessages];
           newMessages[newMessages.length - 1] = { role: 'assistant', content: assistantMessage.trim() };
           return newMessages;
@@ -86,7 +83,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error in sendMessage:', error);
-      setMessages(prevMessages => [
+      setMessages((prevMessages) => [
         ...prevMessages,
         { role: 'assistant', content: 'Sorry, an error occurred. Please try again.' },
       ]);
@@ -107,19 +104,31 @@ export default function Home() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleLogout = () => {
+    if (isMounted && router) {
+      router.push('/signin');
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #ffffff 50%, #222222 100%)',
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center"
-      }}>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #ffffff 50%, #222222 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <Stack
-          direction={"column"}
-          width={{ xs: "100%", sm: "80%", md: "60%", lg: "40%" }}
+          direction={'column'}
+          width={{ xs: '100%', sm: '80%', md: '60%', lg: '40%' }}
           height="80vh"
           border="1px solid #ccc"
           borderRadius={4}
@@ -127,75 +136,59 @@ export default function Home() {
           boxShadow={3}
           spacing={3}
         >
-          <ul
-            style={{
-              listStyle: "none",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              width: "100%",
-              paddingRight: "10px",
-              paddingTop: "33px",
-            }}
+          <motion.div
+            className="chat-box"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
-
-                                            <ul>
-                          <div className="chat-container">
-                              <ul className="messages">
-                              <motion.div 
-                                  className="chat-box"
-                                  initial={{ scale: 0.9, opacity: 0 }}
-                                  animate={{ scale: 1, opacity: 1 }}
-                                  transition={{ duration: 0.5 }}
-                              >
-                                  <div className="chat-box-header">
-                                      <motion.h1 
-                                          initial={{ y: -20, opacity: 0 }}
-                                          animate={{ y: 0, opacity: 1 }}
-                                          transition={{ delay: 0.3, duration: 0.5 }}
-                                      >
-                                          RateMyProfAI
-                                      </motion.h1>
-                                  </div>
-                              </motion.div>
-                              </ul>
-                          </div>
-                      </ul>
-                      <Divider />
-                      <Stack
-                        direction={"column"}
-                        spacing={2}
-                        flexGrow={1}
-                        alignItems="center" // Center items horizontally
-                        justifyContent="center"
-                        style = {{ textAlign: "center" }}
-                        fontStyle={"normal"} // Center items vertically
-                      >
-                      </Stack>
-          </ul>
+            <Box
+              className="chat-box-header"
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <motion.h1
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                style={{ color: 'black', textDecoration: 'none', marginRight: '8px' }}
+              >
+                RateMyProfAI
+              </motion.h1>
+              <Box display="flex" alignItems="center">
+                <a
+                  href="https://www.ratemyprofessors.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'black', textDecoration: 'none', marginRight: '10px' }}
+                >
+                  <FaComments size={30} style={{ color: 'black' }} />
+                </a>
+                <FaSignOutAlt
+                  size={30}
+                  style={{ color: 'black', cursor: 'pointer' }}
+                  onClick={handleLogout}
+                  title="Logout"
+                />
+              </Box>
+            </Box>
+          </motion.div>
           <Divider />
-          <Stack
-            direction={"column"}
-            spacing={2}
-            flexGrow={1}
-            overflow="auto"
-            maxHeight="100%"
-          >
+          <Stack direction={'column'} spacing={2} flexGrow={1} overflow="auto" maxHeight="100%">
             {messages.map((message, index) => (
               <Box
                 key={index}
                 display="flex"
-                justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
+                justifyContent={message.role === 'assistant' ? 'flex-start' : 'flex-end'}
                 mb={2}
               >
                 <Box
-                  bgcolor={message.role === "assistant" ? "secondary.main" : "primary.main"}
-                  color={message.role === "assistant" ? "black" : "white"}
+                  bgcolor={message.role === 'assistant' ? 'secondary.main' : 'primary.main'}
+                  color={message.role === 'assistant' ? 'black' : 'white'}
                   borderRadius={4}
                   p={2}
                   maxWidth="75%"
                 >
-                  {message.role === "assistant" ? (
+                  {message.role === 'assistant' ? (
                     <Typography component="div">
                       {message.content.split('\n').map((paragraph, i) => (
                         <Typography key={i} paragraph>
@@ -215,7 +208,7 @@ export default function Home() {
             ))}
             <div ref={messagesEndRef} />
           </Stack>
-          <Stack direction={"row"} spacing={2} mt={2}>
+          <Stack direction={'row'} spacing={2} mt={2}>
             <TextField
               label="Message"
               fullWidth
@@ -233,8 +226,9 @@ export default function Home() {
               disabled={isLoading}
               aria-label="Send message"
               size="large"
+              style={{ backgroundColor: 'black', color: 'white' }}
             >
-              {isLoading ? "Sending..." : "Send"}
+              {isLoading ? 'Sending...' : 'Send'}
             </Button>
           </Stack>
         </Stack>
