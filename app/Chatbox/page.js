@@ -1,10 +1,11 @@
 'use client'
 
-import { Box, Button, Stack, TextField, Divider, Typography } from '@mui/material';
+import { Box, Button, Stack, TextField, Divider, Typography, Container } from '@mui/material';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Link from 'next/link';
 import Image from 'next/image'; // Import from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion';
 
 const theme = createTheme({
   breakpoints: {
@@ -110,7 +111,7 @@ export default function Home() {
     <ThemeProvider theme={theme}>
       <Box sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #F1F0EA 50%, #222222 100%)',
+        background: 'linear-gradient(135deg, #ffffff 50%, #222222 100%)',
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -132,26 +133,45 @@ export default function Home() {
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-evenly",
-              width: "105vw",
+              width: "100%",
               paddingRight: "10px",
               paddingTop: "33px",
             }}
           >
-            <li>
-                <Image
-                  id="logo"
-                  src="" // Update with the correct path
-                  alt="RateMyProfAI"
-                  width={50}
-                  height={50}
-                />
-            </li>
-            <li>
-              <Link href="https://www.ratemyprofessors.com/" passHref>
-                <i className="bx bxs-chat" style={{ color: "black" }}></i>
-                <p>RMP</p>
-              </Link>
-            </li>
+
+                                            <ul>
+                          <div className="chat-container">
+                              <ul className="messages">
+                              <motion.div 
+                                  className="chat-box"
+                                  initial={{ scale: 0.9, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  transition={{ duration: 0.5 }}
+                              >
+                                  <div className="chat-box-header">
+                                      <motion.h1 
+                                          initial={{ y: -20, opacity: 0 }}
+                                          animate={{ y: 0, opacity: 1 }}
+                                          transition={{ delay: 0.3, duration: 0.5 }}
+                                      >
+                                          RateMyProfAI
+                                      </motion.h1>
+                                  </div>
+                              </motion.div>
+                              </ul>
+                          </div>
+                      </ul>
+                      <Divider />
+                      <Stack
+                        direction={"column"}
+                        spacing={2}
+                        flexGrow={1}
+                        alignItems="center" // Center items horizontally
+                        justifyContent="center"
+                        style = {{ textAlign: "center" }}
+                        fontStyle={"normal"} // Center items vertically
+                      >
+                      </Stack>
           </ul>
           <Divider />
           <Stack
