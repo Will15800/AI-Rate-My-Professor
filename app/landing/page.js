@@ -1,38 +1,3 @@
-/**
-
-/* function LandingPage() {
-'use client';
-import React from 'react';
-import  './style.css';
-
-function LandingPage() {
-  return (
-    <div className="landing-container">
-      <header className="header">
-        <div className="logo">profplus.</div>
-        <div className="auth-buttons">
-          <button className="sign-in">Sign in</button>
-          <button className="register">Register</button>
-        </div>
-      </header>
-      <div className="main-content">
-        <h1>ProfPlus</h1>
-        <p>Get ahead of your classes.</p>
-        <button className="start-button">Start</button>
-      </div>
-      <footer className="footer">
-        <div className="social-icons">
-          <span className="icon">🐱</span>
-          <span className="icon">in</span>
-        </div>
-      </footer>
-    </div>
-  );
-}
-*/
-
-/* export default LandingPage; */
-
 'use client';
 
 import { useState } from 'react';
