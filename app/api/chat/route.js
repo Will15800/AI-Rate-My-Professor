@@ -52,11 +52,11 @@ export async function POST(req) {
         let resultString = 'Retrieved professor information:\n';
         result.matches.forEach((match, index) => {
             resultString += `
-Professor ${index + 1}: ${match.id}
-Review: ${match.metadata.review.slice(0, 300)}...
-Subject: ${match.metadata.subject}
-Stars: ${match.metadata.stars}
-`;
+            Professor ${index + 1}: ${match.id}
+            Review: ${match.metadata.review.slice(0, 300)}...
+            Subject: ${match.metadata.subject}
+            Stars: ${match.metadata.stars}
+            `;
         });
 
         console.log("User query:", text);
@@ -65,22 +65,22 @@ Stars: ${match.metadata.stars}
         // Combine the system prompt, user query, and RAG results
         const inputContent = `${systemPrompt}
 
-User query: "${text}"
+        User query: "${text}"
 
-${resultString}
+        ${resultString}
 
-Based on the above information, please provide a helpful and complete response to the user's query. If recommending professors, please format your response as follows:
+        Based on the above information, please provide a helpful and complete response to the user's query. If recommending professors, please format your response as follows:
 
-Hello! Here are some recommended professors for database management:
+        Hello! Here are some recommended professors for database management:
 
-Professor [Name]:
-- [Key point about teaching style]
-- [Student feedback]
-- Course: "[Course Name]", Rating: [X.X] out of 5
+        Professor [Name]:
+        - [Key point about teaching style]
+        - [Student feedback]
+        - Course: "[Course Name]", Rating: [X.X] out of 5
 
-[Repeat for each professor]
+        [Repeat for each professor]
 
-Is there anything else you'd like to know about these professors or their courses?`;
+        Is there anything else you'd like to know about these professors or their courses?`;
 
         console.log("Input content for language model:", inputContent);
 

@@ -1,9 +1,10 @@
 'use client'
 
-import { Box, Button, Stack, TextField, Divider, Typography } from '@mui/material'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { Box, Button, Stack, TextField, Divider, Typography } from '@mui/material';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Link from 'next/link';
+import Image from 'next/image'; // Import from 'next/image'
 
 const theme = createTheme({
   breakpoints: {
@@ -31,9 +32,9 @@ export default function Home() {
       role: 'assistant',
       content: `Hi! I'm the Rate My Professor support assistant. How can I help you today?`,
     },
-  ])
-  const [message, setMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  ]);
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   const sendMessage = useCallback(async () => {
@@ -97,7 +98,7 @@ export default function Home() {
     if (event.key === 'Enter' && !isLoading) {
       sendMessage();
     }
-  }
+  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -107,40 +108,51 @@ export default function Home() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box
-        width="100vw"
-        height="100vh"
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        bgcolor="#f5f5f5"
-        p={2}
-      >
+      <Box sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #F1F0EA 50%, #222222 100%)',
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center"
+      }}>
         <Stack
-           direction={"column"}
-           width={{ xs: "100%", sm: "80%", md: "60%", lg: "40%" }}
-           height="80vh"
-           border="1px solid #ccc"
-           borderRadius={4}
-           bgcolor="white"
-           p={2}
-           boxShadow={3}
-           spacing={3}
+          direction={"column"}
+          width={{ xs: "100%", sm: "80%", md: "60%", lg: "40%" }}
+          height="80vh"
+          border="1px solid #ccc"
+          borderRadius={4}
+          p={2}
+          boxShadow={3}
+          spacing={3}
         >
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
+          <ul
+            style={{
+              listStyle: "none",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              width: "105vw",
+              paddingRight: "10px",
+              paddingTop: "33px",
+            }}
           >
-            <Link href="https://www.ratemyprofessors.com/" passHref>
-              <Box display="flex" flexDirection="column" alignItems="center">
-                <i className="bx bxs-chat" style={{ color: "#1976d2", fontSize: "36px" }}></i>
-                <Typography variant="h6" color="primary">Rate My Professor</Typography>
-              </Box>
-            </Link>
-          </Box>
+            <li>
+                <Image
+                  id="logo"
+                  src="" // Update with the correct path
+                  alt="RateMyProfAI"
+                  width={50}
+                  height={50}
+                />
+            </li>
+            <li>
+              <Link href="https://www.ratemyprofessors.com/" passHref>
+                <i className="bx bxs-chat" style={{ color: "black" }}></i>
+                <p>RMP</p>
+              </Link>
+            </li>
+          </ul>
           <Divider />
           <Stack
             direction={"column"}
@@ -207,7 +219,7 @@ export default function Home() {
           </Stack>
         </Stack>
         <Typography variant="caption" color="grey" fontStyle="italic" mt={2}>
-          This AI assistant is NOT a certified academic advisor.
+          This AI helper is not a licensed academic advisor.
         </Typography>
       </Box>
     </ThemeProvider>

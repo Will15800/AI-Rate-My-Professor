@@ -84,7 +84,11 @@ const SignUpPage = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar position="static" color="primary">
+      <Box sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #F1F0EA 50%, #222222 100%)',
+      }}>
+      <AppBar position="static" color="transparent" elevation={1}>
         <Toolbar>
           <Typography variant="h6" color="inherit">
             RateMyProfAI
@@ -181,6 +185,7 @@ const SignUpPage = () => {
           </Box>
         </Box>
       </Container>
+      </Box>
     </ThemeProvider>
   );
 };
