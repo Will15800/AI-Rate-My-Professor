@@ -3,7 +3,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import Groq from 'groq-sdk';
 
 const groq = new Groq({
-  apiKey: "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",
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const systemPrompt = `
@@ -14,7 +14,7 @@ export async function POST(req) {
     try {
         const data = await req.json();
         const pc = new Pinecone({
-            apiKey: "f4e52f5b-8b02-494a-9696-ccd352a071be",
+            apiKey: process.env.PINECONE_API_KEY,
         });
         const index = pc.index('rag');
 
