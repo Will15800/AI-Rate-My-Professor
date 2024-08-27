@@ -3,7 +3,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import Groq from 'groq-sdk';
 
 const groq = new Groq({
-  apiKey: "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",
+  apiKey: "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",
 });
 
 const systemPrompt = `
